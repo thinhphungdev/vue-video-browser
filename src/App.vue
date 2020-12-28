@@ -1,28 +1,57 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <div class="container">
+      <h1>The Thinh Phung's Video Browser App</h1>
+      <SearchBar @termChange="onTermChange" /> 
+      <div class="row"> 
+        <VideoDetails :video="selectedVideo" /> 
+        <VideoList @videoSelect="onVideoSelect" :videos = "videos" />
+      </div>
+      <h4>Created by Thinh Phung. Dec, 2020</h4>
+  </div> 
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import SearchBar from "./components/SearchBar"
+import VideoList from "./components/VideoList"
+import VideoDetails from './components/VideoDetails.vue'
+import axios from "axios";
 
+const API_KEY = "AIzaSyBUeCBpZrAPOOhBTB94O8npFD6t-njnS4o";
 export default {
-  name: 'App',
+  name: 'App', 
   components: {
-    HelloWorld
+  SearchBar,
+  VideoList,
+  VideoDetails
+  },
+  data() {
+    return {
+       videos : [],
+       selectedVideo: null
+    }
+  },
+  methods: {
+    onTermChange(searchterm) {
+      axios.get('https://www.googleapis.com/youtube/v3/search', {
+        params: {
+          key: API_KEY,
+          type: 'video',
+          part: 'snippet',
+          q: searchterm
+        }
+      })
+      .then(response => {
+         this.videos = response.data.items;
+      })
+    },
+    onVideoSelect(video) {
+      this.selectedVideo = video;
+    }
   }
 }
+// NOTE: Simple Vue app, build for fun to apply Vue knowledge in practice. 
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+
 </style>
